@@ -12,6 +12,7 @@ function App() {
   const [players, setPlayers] = useState([]);
   const [gameId, setGameId] = useState(null);
   const [currentRound, setCurrentRound] = useState(1);
+  const [totalRounds, setTotalRounds] = useState(4);
   const [currentTurnIdx, setCurrentTurnIdx] = useState(0);
   const [turnId, setTurnId] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
@@ -39,9 +40,10 @@ function App() {
     return { setter, guesser };
   };
 
-  const handleGameStart = (playersData, newGameId) => {
+  const handleGameStart = (playersData, newGameId, rounds) => {
     setPlayers(playersData);
     setGameId(newGameId);
+    setTotalRounds(rounds);
     setCurrentRound(1);
     setCurrentTurnIdx(0);
     setView('HANDOFF_SETTER');
@@ -66,7 +68,7 @@ function App() {
       nextRound += 1;
     }
 
-    if (nextRound > 4) {
+    if (nextRound > totalRounds) {
       setView('GAME_OVER');
     } else {
       setCurrentTurnIdx(nextTurn);
@@ -85,7 +87,7 @@ function App() {
     <div className="w-full max-w-lg mx-auto h-[100dvh] flex flex-col p-2 sm:p-4 bg-[#121213] text-white relative overflow-hidden">
       {view !== 'SETUP' && view !== 'GAME_OVER' && (
         <div className="w-full shrink-0">
-          <Leaderboard leaderboard={leaderboard} currentRound={currentRound} setter={setter} guesser={guesser} />
+          <Leaderboard leaderboard={leaderboard} currentRound={currentRound} totalRounds={totalRounds} setter={setter} guesser={guesser} />
         </div>
       )}
 

@@ -7,6 +7,8 @@ function Setup({ onStart }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [roundCount, setRoundCount] = useState(4);
+
   useEffect(() => {
     setNames(prev => {
       if (playerCount > prev.length) {
@@ -33,8 +35,8 @@ function Setup({ onStart }) {
     setError('');
     try {
       const playersData = await initPlayers(names.map(n => n.trim()));
-      const gameData = await startGame();
-      onStart(playersData, gameData.id);
+      const gameData = await startGame(roundCount);
+      onStart(playersData, gameData.id, roundCount);
     } catch (err) {
       setError('Failed to start game. Is the backend running?');
     }
@@ -45,18 +47,34 @@ function Setup({ onStart }) {
     <div className="w-full flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-6 text-center">Pass & Play Wordle</h1>
       
-      <div className="w-full max-w-sm mb-6 bg-gray-900 p-4 rounded-lg border border-wordle-border">
-        <label className="block text-center mb-2 font-bold text-gray-300">
-          Number of Players: <span className="text-wordle-highlight text-xl ml-2">{playerCount}</span>
-        </label>
-        <input 
-          type="range" 
-          min="2" 
-          max="8" 
-          value={playerCount} 
-          onChange={(e) => setPlayerCount(parseInt(e.target.value))}
-          className="w-full accent-wordle-green cursor-pointer"
-        />
+      <div className="w-full max-w-sm mb-6 bg-gray-900 p-4 rounded-lg border border-wordle-border flex flex-col gap-4">
+        <div>
+          <label className="block text-center mb-2 font-bold text-gray-300">
+            Number of Players: <span className="text-wordle-highlight text-xl ml-2">{playerCount}</span>
+          </label>
+          <input 
+            type="range" 
+            min="2" 
+            max="8" 
+            value={playerCount} 
+            onChange={(e) => setPlayerCount(parseInt(e.target.value))}
+            className="w-full accent-wordle-green cursor-pointer"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-center mb-2 font-bold text-gray-300">
+            Total Rounds: <span className="text-wordle-highlight text-xl ml-2">{roundCount}</span>
+          </label>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            value={roundCount} 
+            onChange={(e) => setRoundCount(parseInt(e.target.value))}
+            className="w-full accent-wordle-green cursor-pointer"
+          />
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full max-w-sm overflow-y-auto max-h-[40vh] p-1">

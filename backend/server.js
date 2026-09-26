@@ -62,7 +62,10 @@ app.post('/api/players/init', async (req, res) => {
 // 2. POST /api/games/start -> Create a new game session
 app.post('/api/games/start', async (req, res) => {
   try {
-    const result = await pool.query('INSERT INTO game_sessions (status, current_round) VALUES ($1, $2) RETURNING *', ['IN_PROGRESS', 1]);
+    const { totalRounds = 4 } = req.body || {};
+    // Ensure column exists first in case of live schema updates
+    await pool.query(`ALTER TABLE game_sessions ADD COLUMN IF NOT EXISTS total_rounds INTEGER DEFAULT 4`);
+    const result = await pool.query('INSERT INTO game_sessions (status, current_round, total_rounds) VALUES ($1, $2, $3) RETURNING *', ['IN_PROGRESS', 1, totalRounds]);
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });

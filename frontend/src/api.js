@@ -11,8 +11,8 @@ export const initPlayers = async (players) => {
   return data;
 };
 
-export const startGame = async () => {
-  const { data } = await api.post('/games/start');
+export const startGame = async (totalRounds = 4) => {
+  const { data } = await api.post('/games/start', { totalRounds });
   return data;
 };
 

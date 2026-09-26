@@ -1,8 +1,8 @@
-function Leaderboard({ leaderboard, currentRound, setter, guesser }) {
+function Leaderboard({ leaderboard, currentRound, totalRounds, setter, guesser }) {
   return (
     <div className="w-full mb-4 border-b border-wordle-border pb-4">
       <div className="flex justify-between items-center mb-4 text-sm font-bold text-gray-400">
-        <div className="bg-wordle-border px-2 py-1 rounded">Round {currentRound}/4</div>
+        <div className="bg-wordle-border px-2 py-1 rounded">Round {currentRound}/{totalRounds}</div>
         <div className="flex gap-2">
           <span>Setter: <span className="text-wordle-highlight">{setter?.name}</span></span>
           <span>|</span>
