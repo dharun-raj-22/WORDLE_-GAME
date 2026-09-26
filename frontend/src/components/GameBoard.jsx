@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import Keyboard from './Keyboard';
 import { submitGuess } from '../api';
+import { socket } from '../socket';
 
-function GameBoard({ turnId, onTurnEnd }) {
+function GameBoard({ turnId, onTurnEnd, isSpectator = false, guesserName }) {
   const [board, setBoard] = useState(
     Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => ({ letter: '', state: '', animate: '' })))
   );
@@ -12,6 +13,32 @@ function GameBoard({ turnId, onTurnEnd }) {
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
+    if (isSpectator) {
+      const handleSpectatorUpdate = (boardRows) => {
+        // boardRows is an array of rows (each row is 5 tiles)
+        const newBoard = Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => ({ letter: '', state: '', animate: '' })));
+        const newKeyColors = {};
+        
+        boardRows.forEach((row, rIdx) => {
+          row.forEach((tile, cIdx) => {
+            newBoard[rIdx][cIdx] = tile;
+            if (tile.state === 'green') newKeyColors[tile.letter] = 'green';
+            else if (tile.state === 'yellow' && newKeyColors[tile.letter] !== 'green') newKeyColors[tile.letter] = 'yellow';
+            else if (tile.state === 'gray' && newKeyColors[tile.letter] !== 'green' && newKeyColors[tile.letter] !== 'yellow') newKeyColors[tile.letter] = 'gray';
+          });
+        });
+        
+        setBoard(newBoard);
+        setKeyColors(newKeyColors);
+      };
+      
+      socket.on('spectator_update', handleSpectatorUpdate);
+      return () => socket.off('spectator_update');
+    }
+  }, [isSpectator]);
+
+  useEffect(() => {
+    if (isSpectator) return;
     const handleKeyDown = (e) => {
       if (isAnimating) return;
       if (e.key === 'Enter') handleKey('ENTER');
@@ -20,10 +47,10 @@ function GameBoard({ turnId, onTurnEnd }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentRow, currentCol, isAnimating, board]);
+  }, [currentRow, currentCol, isAnimating, board, isSpectator]);
 
   const handleKey = async (key) => {
-    if (isAnimating) return;
+    if (isSpectator || isAnimating) return;
 
     if (key === 'ENTER') {
       if (currentCol !== 5) {
@@ -68,6 +95,7 @@ function GameBoard({ turnId, onTurnEnd }) {
       
       const newBoard = [...board];
       const newKeyColors = { ...keyColors };
+      const rowToBroadcast = [];
       
       // Animate flip one by one
       for (let i = 0; i < 5; i++) {
@@ -87,9 +115,16 @@ function GameBoard({ turnId, onTurnEnd }) {
           else if (evalState === 'gray' && newKeyColors[letter] !== 'green' && newKeyColors[letter] !== 'yellow') newKeyColors[letter] = 'gray';
           setKeyColors({...newKeyColors});
         }, 300);
+        
+        rowToBroadcast.push({ letter: guessWord[i], state: evalState, animate: '' });
       }
 
       await new Promise(r => setTimeout(r, 800));
+
+      // Emit to spectators
+      if (socket.connected) {
+        socket.emit('guess_submitted_multiplayer', rowToBroadcast);
+      }
 
       if (data.is_solved || currentRow === 5) {
         onTurnEnd(data);
@@ -113,6 +148,12 @@ function GameBoard({ turnId, onTurnEnd }) {
 
   return (
     <div className="w-full flex-grow flex flex-col justify-between items-center h-full pb-2">
+      {isSpectator && (
+        <div className="w-full text-center py-2 bg-gray-900 border border-wordle-border rounded-lg mb-2">
+          <p className="font-bold text-gray-300">Spectating <span className="text-wordle-highlight">{guesserName}</span>...</p>
+        </div>
+      )}
+      
       <div className="flex-1 flex justify-center items-center w-full min-h-0 py-2">
         <div className="grid grid-rows-6 gap-1 w-full max-w-[320px] max-h-[360px] aspect-[5/6]">
           {board.map((row, r) => (
@@ -134,9 +175,11 @@ function GameBoard({ turnId, onTurnEnd }) {
         </div>
       </div>
       
-      <div className="w-full">
-        <Keyboard onKeyPress={handleKey} keyColors={keyColors} />
-      </div>
+      {!isSpectator && (
+        <div className="w-full">
+          <Keyboard onKeyPress={handleKey} keyColors={keyColors} />
+        </div>
+      )}
     </div>
   );
 }

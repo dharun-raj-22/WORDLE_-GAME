@@ -177,6 +177,12 @@ app.get('/api/games/:id/summary', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const http = require('http');
+const initSocket = require('./socketHandler');
+
+const server = http.createServer(app);
+const io = initSocket(server);
+
+server.listen(PORT, () => {
+  console.log(`Server and Socket.IO are running on port ${PORT}`);
 });
