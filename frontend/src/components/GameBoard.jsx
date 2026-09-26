@@ -112,27 +112,31 @@ function GameBoard({ turnId, onTurnEnd }) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="grid grid-rows-6 gap-1.5 w-full max-w-[320px] aspect-[5/6] mb-8">
-        {board.map((row, r) => (
-          <div key={r} className="grid grid-cols-5 gap-1.5 h-full">
-            {row.map((tile, c) => (
-              <div 
-                key={c} 
-                className={`flex justify-center items-center text-3xl font-bold uppercase border-2 h-full w-full
-                  ${getBgColor(tile.state)}
-                  ${tile.letter && !tile.state ? 'border-[#818384]' : ''}
-                  ${tile.animate}
-                `}
-              >
-                {tile.letter}
-              </div>
-            ))}
-          </div>
-        ))}
+    <div className="w-full flex-grow flex flex-col justify-between items-center h-full pb-2">
+      <div className="flex-1 flex justify-center items-center w-full min-h-0 mb-4">
+        <div className="grid grid-rows-6 gap-1 sm:gap-1.5 w-full max-w-[280px] sm:max-w-[320px] aspect-[5/6] max-h-full">
+          {board.map((row, r) => (
+            <div key={r} className="grid grid-cols-5 gap-1 sm:gap-1.5 h-full">
+              {row.map((tile, c) => (
+                <div 
+                  key={c} 
+                  className={`flex justify-center items-center text-2xl sm:text-3xl font-bold uppercase border-2 h-full w-full
+                    ${getBgColor(tile.state)}
+                    ${tile.letter && !tile.state ? 'border-[#818384]' : ''}
+                    ${tile.animate}
+                  `}
+                >
+                  {tile.letter}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       
-      <Keyboard onKeyPress={handleKey} keyColors={keyColors} />
+      <div className="w-full">
+        <Keyboard onKeyPress={handleKey} keyColors={keyColors} />
+      </div>
     </div>
   );
 }
