@@ -82,12 +82,14 @@ function App() {
   const { setter, guesser } = getSetterGuesser();
 
   return (
-    <div className="w-full max-w-lg mx-auto h-full flex flex-col p-4 bg-wordle-dark text-white relative">
+    <div className="w-full max-w-lg mx-auto h-[100dvh] flex flex-col p-2 sm:p-4 bg-[#121213] text-white relative overflow-hidden">
       {view !== 'SETUP' && view !== 'GAME_OVER' && (
-        <Leaderboard leaderboard={leaderboard} currentRound={currentRound} setter={setter} guesser={guesser} />
+        <div className="w-full shrink-0">
+          <Leaderboard leaderboard={leaderboard} currentRound={currentRound} setter={setter} guesser={guesser} />
+        </div>
       )}
 
-      <div className="flex-grow flex flex-col justify-center items-center w-full">
+      <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0">
         {view === 'SETUP' && <Setup onStart={handleGameStart} />}
         
         {view === 'HANDOFF_SETTER' && (

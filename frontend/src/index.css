@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+html, body, #root {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
   background-color: #121213;
+}
   color: #ffffff;
   margin: 0;
   font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
