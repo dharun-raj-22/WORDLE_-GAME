@@ -55,17 +55,18 @@ function initSocket(server) {
     });
 
     // Start Game
-    socket.on('start_multiplayer_game', (dbPlayersData) => {
+    socket.on('start_multiplayer_game', ({ dbPlayers, gameId }) => {
       // Sync DB IDs to memory state
-      if (dbPlayersData && dbPlayersData.length > 0) {
+      if (dbPlayers && dbPlayers.length > 0) {
         gameState.players = gameState.players.map((p, idx) => ({
             ...p,
-            dbId: dbPlayersData[idx]?.id
+            id: dbPlayers[idx]?.id // Use DB ID for setWord and submitGuess
         }));
       }
       gameState.status = 'IN_PROGRESS';
       gameState.currentRound = 1;
       gameState.currentTurnIdx = 0;
+      gameState.gameId = gameId;
       
       updateTurnPointers();
       

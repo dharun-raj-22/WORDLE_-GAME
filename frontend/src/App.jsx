@@ -195,7 +195,7 @@ function App() {
         
         {/* SHARED SET_WORD */}
         {(view === 'SET_WORD' || activeMpView === 'SET_WORD') && (
-          <SetWord gameId={gameId} setter={setter} guesser={guesser} onWordSet={handleWordSet} />
+          <SetWord gameId={gameId || mpGameState?.gameId} setter={setter} guesser={guesser} onWordSet={handleWordSet} />
         )}
 
         {/* MULTIPLAYER SPECTATOR VIEWS */}
@@ -242,7 +242,7 @@ function App() {
 
         {/* SHARED GAME OVER */}
         {view === 'GAME_OVER' && (
-          <GameOver gameId={gameId} onPlayAgain={handlePlayAgain} />
+          <GameOver gameId={gameId || mpGameState?.gameId} onPlayAgain={handlePlayAgain} />
         )}
       </div>
     </div>

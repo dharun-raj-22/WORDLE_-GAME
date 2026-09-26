@@ -48,7 +48,7 @@ app.post('/api/players/init', async (req, res) => {
     const results = [];
     for (const pName of players) {
       const result = await pool.query(
-        'INSERT INTO players (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET games_played = players.games_played + 1 RETURNING id, name, total_points, games_played, rounds_won',
+        'INSERT INTO players (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET games_played = players.games_played + 1, total_points = 0, rounds_won = 0 RETURNING id, name, total_points, games_played, rounds_won',
         [pName]
       );
       results.push(result.rows[0]);

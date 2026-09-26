@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { socket } from '../socket';
+import { initPlayers, startGame } from '../api';
 
 function Lobby({ onStartGame, onBack }) {
   const [name, setName] = useState('');
@@ -38,9 +39,15 @@ function Lobby({ onStartGame, onBack }) {
     setHasJoined(true);
   };
 
-  const handleStart = () => {
-    // Optionally init DB players here before starting
-    socket.emit('start_multiplayer_game', lobbyState.players);
+  const handleStart = async () => {
+    try {
+      // Sync with DB so we get proper player IDs and game ID for turns
+      const dbPlayers = await initPlayers(lobbyState.players.map(p => p.name));
+      const gameData = await startGame(roundCount);
+      socket.emit('start_multiplayer_game', { dbPlayers, gameId: gameData.id });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (!hasJoined) {
