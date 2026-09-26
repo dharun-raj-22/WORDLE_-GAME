@@ -56,9 +56,10 @@ function SetWord({ gameId, setter, guesser, onWordSet }) {
           <button 
             type="button" 
             onClick={() => setVisible(!visible)}
-            className="bg-wordle-border px-4 rounded-r hover:bg-gray-700 transition"
+            className="bg-wordle-border px-4 rounded-r hover:bg-gray-700 transition text-xl"
+            title="Toggle Visibility"
           >
-            {visible ? 'Hide' : 'Show'}
+            {visible ? '👁️' : '👁️‍🗨️'}
           </button>
         </div>
         

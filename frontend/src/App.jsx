@@ -35,7 +35,7 @@ function App() {
   const getSetterGuesser = () => {
     if (players.length === 0) return { setter: null, guesser: null };
     const setter = players[currentTurnIdx];
-    const guesser = players[(currentTurnIdx + 1) % 4];
+    const guesser = players[(currentTurnIdx + 1) % players.length];
     return { setter, guesser };
   };
 
@@ -61,7 +61,7 @@ function App() {
     let nextTurn = currentTurnIdx + 1;
     let nextRound = currentRound;
     
-    if (nextTurn >= 4) {
+    if (nextTurn >= players.length) {
       nextTurn = 0;
       nextRound += 1;
     }

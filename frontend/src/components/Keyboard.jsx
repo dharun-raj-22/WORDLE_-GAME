@@ -24,7 +24,7 @@ function Keyboard({ onKeyPress, keyColors }) {
               className={`
                 ${key === 'ENTER' || key === 'BACKSPACE' ? 'flex-[1.5] text-[10px] sm:text-xs' : 'flex-1 text-xs sm:text-sm'}
                 h-[40px] sm:h-[58px] rounded font-bold uppercase active:scale-95 transition-transform
-                flex items-center justify-center select-none
+                flex items-center justify-center select-none touch-manipulation
                 ${getKeyColor(key)}
               `}
             >

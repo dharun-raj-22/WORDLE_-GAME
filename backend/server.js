@@ -41,8 +41,8 @@ function evaluateGuess(guess, secret) {
 app.post('/api/players/init', async (req, res) => {
   try {
     const { players } = req.body;
-    if (!players || players.length !== 4) {
-      return res.status(400).json({ error: "Requires exactly 4 player names" });
+    if (!players || players.length < 2 || players.length > 8) {
+      return res.status(400).json({ error: "Requires between 2 and 8 player names" });
     }
     
     const results = [];

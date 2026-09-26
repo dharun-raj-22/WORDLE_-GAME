@@ -36,7 +36,7 @@ function GameOver({ gameId, onPlayAgain }) {
         {winners.length > 1 ? `It's a Tie between ${winners.map(w => w.name).join(' & ')}!` : `${winner.name} Wins!`}
       </h2>
       
-      <div className="flex flex-col gap-3 mb-8">
+      <div className="flex flex-col gap-3 mb-8 overflow-y-auto max-h-[50vh] p-2">
         {leaderboard.map((p, i) => {
           const isWinner = p.total_points === winner.total_points;
           return (
