@@ -49,8 +49,3 @@ export const getGameSummary = async (gameId) => {
   const { data } = await api.get(`/games/${gameId}/summary`);
   return data;
 };
-
-export const resetGameData = async () => {
-  const { data } = await api.post('/games/reset');
-  return data;
-};

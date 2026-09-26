@@ -45,6 +45,9 @@ app.post('/api/players/init', async (req, res) => {
       return res.status(400).json({ error: "Requires between 2 and 8 player names" });
     }
     
+    // Erase all previous historical data before starting a new game session!
+    await pool.query('TRUNCATE TABLE round_turns, game_sessions, players RESTART IDENTITY CASCADE');
+
     const results = [];
     for (const pName of players) {
       const result = await pool.query(
@@ -172,17 +175,6 @@ app.get('/api/games/:id/summary', async (req, res) => {
       game: gameRes.rows[0],
       turns: turnsRes.rows
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 8. POST /api/games/reset -> Erase all players, points, and game data
-app.post('/api/games/reset', async (req, res) => {
-  try {
-    // Cascade delete everything except the dictionary to give a clean slate
-    await pool.query('TRUNCATE TABLE round_turns, game_sessions, players RESTART IDENTITY CASCADE');
-    res.json({ success: true, message: "All player and game data erased." });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
