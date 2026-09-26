@@ -24,7 +24,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -224,6 +224,17 @@ header {
     gap: 6px;
 }
 
+@media (max-height: 750px) {
+    #board {
+        max-width: 280px;
+        gap: 4px;
+        padding: 5px;
+    }
+    .row {
+        gap: 4px;
+    }
+}
+
 .tile {
     border: 2px solid var(--border-color);
     display: flex;
@@ -235,6 +246,12 @@ header {
     transition: transform 0.1s ease;
     user-select: none;
     color: var(--text-color);
+}
+
+@media (max-height: 750px) {
+    .tile {
+        font-size: 1.5rem;
+    }
 }
 
 .tile[data-state="active"] {
@@ -301,6 +318,13 @@ header {
     text-transform: uppercase;
     transition: background-color 0.2s;
     padding: 0;
+}
+
+@media (max-height: 750px) {
+    .key {
+        height: 44px;
+        font-size: 1rem;
+    }
 }
 
 .key:active {
