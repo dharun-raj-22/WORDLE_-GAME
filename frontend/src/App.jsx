@@ -163,7 +163,7 @@ function App() {
   }
 
   const renderHeader = () => {
-    if (['MODE_SELECT', 'SETUP', 'LOBBY', 'GAME_OVER'].includes(view)) return null;
+    if (['MODE_SELECT', 'SETUP', 'LOBBY', 'LOBBY_HOST', 'LOBBY_JOIN', 'MULTIPLAYER_JOIN', 'GAME_OVER'].includes(view)) return null;
     const r = mode === 'MULTIPLAYER' ? mpGameState?.currentRound : currentRound;
     const tR = mode === 'MULTIPLAYER' ? mpGameState?.totalRounds : totalRounds;
     return (
