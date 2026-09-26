@@ -15,6 +15,7 @@ function initSocket(server) {
     hostId: null,
     players: [], // { id, name, socketId }
     totalRounds: 4,
+    totalPlayers: 4,
     currentRound: 1,
     currentTurnIdx: 0,
     status: 'LOBBY', // LOBBY, IN_PROGRESS, ROUND_END, GAME_OVER
@@ -28,6 +29,21 @@ function initSocket(server) {
   io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
 
+    // Check Room Before Joining
+    socket.on('check_room', (code, callback) => {
+      if (code === ROOM_CODE && gameState.hostId) {
+        const hostPlayer = gameState.players.find(p => p.socketId === gameState.hostId);
+        callback({ 
+          valid: true, 
+          hostName: hostPlayer?.name || 'Unknown', 
+          playerCount: gameState.totalPlayers, 
+          roundCount: gameState.totalRounds 
+        });
+      } else {
+        callback({ valid: false, error: 'Room not found or Host has not created it yet.'});
+      }
+    });
+
     // Join Lobby
     socket.on('join_lobby', ({ name, isHost, playerCount, roundCount }) => {
       socket.join(ROOM_CODE);
@@ -39,6 +55,7 @@ function initSocket(server) {
         gameState.hostId = socket.id;
         gameState.players = [newPlayer]; // Reset players if new host
         gameState.totalRounds = roundCount || 4;
+        gameState.totalPlayers = playerCount || 4;
         gameState.status = 'LOBBY';
       } else {
         // Only join if room exists and not full (ignoring strict caps for simplicity)
@@ -50,7 +67,8 @@ function initSocket(server) {
       io.to(ROOM_CODE).emit('lobby_update', {
         players: gameState.players,
         hostId: gameState.hostId,
-        totalRounds: gameState.totalRounds
+        totalRounds: gameState.totalRounds,
+        totalPlayers: gameState.totalPlayers
       });
     });
 

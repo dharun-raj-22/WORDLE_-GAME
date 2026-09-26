@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ModeSelect from './components/ModeSelect';
 import Lobby from './components/Lobby';
+import MultiplayerJoin from './components/MultiplayerJoin';
 import Setup from './components/Setup';
 import Handoff from './components/Handoff';
 import SetWord from './components/SetWord';
@@ -179,14 +180,35 @@ function App() {
       <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0">
         {view === 'MODE_SELECT' && (
           <ModeSelect onSelectMode={(m) => {
-            setMode(m);
-            setView(m === 'LOCAL' ? 'SETUP' : 'LOBBY');
+            if (m === 'LOCAL') {
+              setMode('LOCAL');
+              setView('SETUP');
+            } else if (m === 'HOST') {
+              setMode('MULTIPLAYER');
+              setView('LOBBY_HOST');
+            } else if (m === 'JOIN') {
+              setMode('MULTIPLAYER');
+              setView('MULTIPLAYER_JOIN');
+            }
           }} />
         )}
 
         {view === 'SETUP' && <Setup onStart={handleGameStart} />}
         
-        {view === 'LOBBY' && <Lobby onStartGame={() => {}} onBack={() => setView('MODE_SELECT')} />}
+        {view === 'LOBBY_HOST' && (
+          <Lobby isHostMode={true} onStartGame={() => {}} onBack={() => setView('MODE_SELECT')} />
+        )}
+
+        {view === 'LOBBY_JOIN' && (
+          <Lobby isHostMode={false} prefilledName={myPlayerId} onStartGame={() => {}} onBack={() => setView('MODE_SELECT')} />
+        )}
+
+        {view === 'MULTIPLAYER_JOIN' && (
+          <MultiplayerJoin onJoinRoom={(name) => {
+            setMyPlayerId(name); // Temporarily store name to pass to Lobby
+            setView('LOBBY_JOIN');
+          }} onBack={() => setView('MODE_SELECT')} />
+        )}
         
         {/* LOCAL PASS & PLAY */}
         {view === 'HANDOFF_SETTER' && (
