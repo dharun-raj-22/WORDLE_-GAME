@@ -177,6 +177,17 @@ app.get('/api/games/:id/summary', async (req, res) => {
   }
 });
 
+// 8. POST /api/games/reset -> Erase all players, points, and game data
+app.post('/api/games/reset', async (req, res) => {
+  try {
+    // Cascade delete everything except the dictionary to give a clean slate
+    await pool.query('TRUNCATE TABLE round_turns, game_sessions, players RESTART IDENTITY CASCADE');
+    res.json({ success: true, message: "All player and game data erased." });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const http = require('http');
 const initSocket = require('./socketHandler');
 

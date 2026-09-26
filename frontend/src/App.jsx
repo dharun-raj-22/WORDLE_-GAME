@@ -142,7 +142,12 @@ function App() {
     }
   };
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
+    try {
+      await import('./api').then(module => module.resetGameData());
+    } catch (e) {
+      console.error('Failed to reset game data', e);
+    }
     setView('MODE_SELECT');
     if (mode === 'MULTIPLAYER') {
       socket.disconnect();
