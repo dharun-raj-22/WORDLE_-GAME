@@ -9,17 +9,23 @@ function Lobby({ onStartGame, onBack, isHostMode, prefilledName }) {
   const [playerCount, setPlayerCount] = useState(4);
   const [roundCount, setRoundCount] = useState(4);
   const [lobbyState, setLobbyState] = useState({ players: [], hostId: null });
+  const [isStarting, setIsStarting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   
   useEffect(() => {
     socket.connect();
     
-    socket.on('lobby_update', (data) => {
+    const handleLobbyUpdate = (data) => {
       setLobbyState(data);
-    });
+    };
 
-    socket.on('game_started', (gameState) => {
+    const handleGameStarted = (gameState) => {
+      setIsStarting(false);
       onStartGame(gameState);
-    });
+    };
+
+    socket.on('lobby_update', handleLobbyUpdate);
+    socket.on('game_started', handleGameStarted);
 
     // Auto-join if joining as a guest
     if (!isHostMode && prefilledName && !hasJoined) {
@@ -33,8 +39,8 @@ function Lobby({ onStartGame, onBack, isHostMode, prefilledName }) {
     }
 
     return () => {
-      socket.off('lobby_update');
-      socket.off('game_started');
+      socket.off('lobby_update', handleLobbyUpdate);
+      socket.off('game_started', handleGameStarted);
     };
   }, [onStartGame, isHostMode, prefilledName, hasJoined]);
 
@@ -50,12 +56,16 @@ function Lobby({ onStartGame, onBack, isHostMode, prefilledName }) {
   };
 
   const handleStart = async () => {
+    setIsStarting(true);
+    setErrorMsg('');
     try {
       const dbPlayers = await initPlayers(lobbyState.players.map(p => p.name));
       const gameData = await startGame(roundCount);
       socket.emit('start_multiplayer_game', { dbPlayers, gameId: gameData.id });
     } catch (err) {
       console.error(err);
+      setIsStarting(false);
+      setErrorMsg(err.response?.data?.error || err.message || 'Failed to start game');
     }
   };
 
@@ -113,7 +123,16 @@ function Lobby({ onStartGame, onBack, isHostMode, prefilledName }) {
       </div>
 
       {isHost ? (
-        <button onClick={handleStart} className="w-full max-w-sm bg-wordle-green p-4 rounded text-xl font-bold">Start Game</button>
+        <div className="w-full max-w-sm flex flex-col items-center">
+          <button 
+            onClick={handleStart} 
+            disabled={isStarting}
+            className="w-full bg-wordle-green p-4 rounded text-xl font-bold disabled:opacity-50"
+          >
+            {isStarting ? 'Starting...' : 'Start Game'}
+          </button>
+          {errorMsg && <p className="text-red-500 mt-4 font-bold text-center">{errorMsg}</p>}
+        </div>
       ) : (
         <p className="text-gray-400">Waiting for host to start the game...</p>
       )}

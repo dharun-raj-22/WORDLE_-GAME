@@ -196,11 +196,28 @@ function App() {
         {view === 'SETUP' && <Setup onStart={handleGameStart} />}
         
         {view === 'LOBBY_HOST' && (
-          <Lobby isHostMode={true} onStartGame={() => {}} onBack={() => setView('MODE_SELECT')} />
+          <Lobby 
+            isHostMode={true} 
+            onStartGame={(state) => {
+              setMpGameState(state);
+              setMyPlayerId(socket.id);
+              setView('MP_WAITING');
+            }} 
+            onBack={() => setView('MODE_SELECT')} 
+          />
         )}
 
         {view === 'LOBBY_JOIN' && (
-          <Lobby isHostMode={false} prefilledName={myPlayerId} onStartGame={() => {}} onBack={() => setView('MODE_SELECT')} />
+          <Lobby 
+            isHostMode={false} 
+            prefilledName={myPlayerId} 
+            onStartGame={(state) => {
+              setMpGameState(state);
+              setMyPlayerId(socket.id);
+              setView('MP_WAITING');
+            }} 
+            onBack={() => setView('MODE_SELECT')} 
+          />
         )}
 
         {view === 'MULTIPLAYER_JOIN' && (
