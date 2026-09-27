@@ -16,6 +16,19 @@ function SetWord({ gameId, setter, guesser, onWordSet }) {
     }, 100);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      if (loading) return;
+      
+      if (e.key === 'Enter') handleKeyPress('ENTER');
+      else if (e.key === 'Backspace') handleKeyPress('BACKSPACE');
+      else if (/^[a-zA-Z]$/.test(e.key)) handleKeyPress(e.key.toUpperCase());
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [word, loading]);
+
   const handleMobileInput = (e) => {
     const val = e.target.value;
     

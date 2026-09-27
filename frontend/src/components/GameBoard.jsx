@@ -40,6 +40,9 @@ function GameBoard({ turnId, onTurnEnd, isSpectator = false, guesserName }) {
   useEffect(() => {
     if (isSpectator) return;
     const handleKeyDown = (e) => {
+      // If the user is typing into our hidden input (or any input), ignore it here to prevent double letters
+      if (e.target.tagName === 'INPUT') return;
+      
       if (isAnimating) return;
       if (e.key === 'Enter') handleKey('ENTER');
       else if (e.key === 'Backspace') handleKey('BACKSPACE');
