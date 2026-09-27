@@ -20,6 +20,12 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
 
     // Wait a brief moment for connection to establish if it was offline
     setTimeout(() => {
+      if (!socket.connected) {
+        setLoading(false);
+        setError('Cannot connect to server. Is the backend running?');
+        return;
+      }
+
       socket.emit('check_room', code.trim(), (response) => {
         setLoading(false);
         if (response.valid) {
@@ -30,7 +36,7 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
           setRoomInfo(null);
         }
       });
-    }, socket.connected ? 0 : 500);
+    }, socket.connected ? 0 : 1000);
   };
 
   const handleJoin = () => {
