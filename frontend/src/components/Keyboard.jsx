@@ -14,16 +14,16 @@ function Keyboard({ onKeyPress, keyColors }) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-2 max-w-[500px]">
+    <div className="w-full flex flex-col gap-1 sm:gap-2 max-w-[500px]">
       {rows.map((row, i) => (
-        <div key={i} className="flex justify-center gap-1.5 w-full">
+        <div key={i} className="flex justify-center gap-1 sm:gap-1.5 w-full">
           {row.map(key => (
             <button
               key={key}
               onClick={() => onKeyPress(key)}
               className={`
-                ${key === 'ENTER' || key === 'BACKSPACE' ? 'flex-[1.5] text-[10px] sm:text-xs' : 'flex-1 text-xs sm:text-sm'}
-                h-[40px] sm:h-[58px] rounded font-bold uppercase active:scale-95 transition-transform
+                ${key === 'ENTER' || key === 'BACKSPACE' ? 'flex-[1.5] text-[10px] sm:text-xs px-1' : 'flex-1 text-xs sm:text-sm'}
+                h-[38px] sm:h-[58px] rounded font-bold uppercase active:scale-95 transition-transform
                 flex items-center justify-center select-none touch-manipulation
                 ${getKeyColor(key)}
               `}
