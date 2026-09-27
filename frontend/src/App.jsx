@@ -174,7 +174,7 @@ function App() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto min-h-[100dvh] flex flex-col p-2 sm:p-4 bg-[#121213] text-white relative overflow-y-auto overflow-x-hidden">
+    <div className="w-full max-w-lg mx-auto h-[100dvh] flex flex-col p-2 sm:p-4 bg-[#121213] text-white relative overflow-y-auto">
       {renderHeader()}
 
       <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Keyboard from './Keyboard';
 import { submitGuess } from '../api';
 import { socket } from '../socket';
@@ -146,18 +146,79 @@ function GameBoard({ turnId, onTurnEnd, isSpectator = false, guesserName }) {
     return 'bg-transparent border-wordle-border';
   };
 
+  const inputRef = useRef(null);
+
+  // Focus the hidden input to bring up the mobile keyboard
+  useEffect(() => {
+    if (!isSpectator) {
+      // Small timeout to ensure rendering is complete before focusing
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isSpectator, currentRow, isAnimating]);
+
+  const handleMobileInput = (e) => {
+    const val = e.target.value;
+    
+    // If length is less than 1, it means they pressed Backspace and deleted our dummy space!
+    if (val.length < 1) {
+      handleKey('BACKSPACE');
+    } else if (val.length > 1) {
+      // They typed a new character (dummy space is index 0)
+      const char = val.slice(-1).toUpperCase();
+      if (/^[A-Z]$/.test(char)) {
+        handleKey(char);
+      } else if (char === '\n' || e.nativeEvent.inputType === 'insertLineBreak') {
+         // Some keyboards send line break for Enter
+         handleKey('ENTER');
+      }
+    }
+    
+    // Reset to exactly one dummy space so backspace always works
+    e.target.value = ' ';
+  };
+
+  const handleMobileKeyDown = (e) => {
+    if (e.key === 'Backspace' && e.target.value === ' ') {
+      // Some keyboards DO send Backspace properly, catch it here just in case
+      handleKey('BACKSPACE');
+      e.preventDefault();
+    } else if (e.key === 'Enter') {
+      handleKey('ENTER');
+    }
+  };
+
   return (
-    <div className="w-full flex-grow flex flex-col justify-between items-center h-full pb-2">
+    <div 
+      className="w-full flex-grow flex flex-col justify-between items-center h-full pb-2"
+      onClick={() => inputRef.current?.focus()} // Refocus when tapping anywhere
+    >
+      {!isSpectator && (
+        <input 
+          ref={inputRef}
+          type="text"
+          defaultValue=" "
+          className="absolute opacity-0 pointer-events-none w-0 h-0"
+          onChange={handleMobileInput}
+          onKeyDown={handleMobileKeyDown}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="characters"
+          spellCheck="false"
+        />
+      )}
+
       {isSpectator && (
         <div className="w-full text-center py-2 bg-gray-900 border border-wordle-border rounded-lg mb-2">
           <p className="font-bold text-gray-300">Spectating <span className="text-wordle-highlight">{guesserName}</span>...</p>
         </div>
       )}
       
-      <div className="flex-1 flex justify-center items-center w-full min-h-0 py-1 sm:py-2">
-        <div className="grid grid-rows-6 gap-1 w-full max-w-[340px] h-full max-h-[100%] aspect-[5/6]">
+      <div className="flex-1 flex justify-center items-center w-full min-h-0 py-2">
+        <div className="grid grid-rows-6 gap-1 w-full max-w-[320px] max-h-[360px] aspect-[5/6]">
           {board.map((row, r) => (
-            <div key={r} className="grid grid-cols-5 gap-1 w-full h-full">
+            <div key={r} className="grid grid-cols-5 gap-1 h-full">
               {row.map((tile, c) => (
                 <div 
                   key={c} 
