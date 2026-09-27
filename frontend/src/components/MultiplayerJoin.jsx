@@ -43,6 +43,16 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
       <h1 className="text-3xl font-bold mb-6 text-center">Join Multiplayer Room</h1>
 
       <div className="w-full max-w-sm bg-gray-900 p-6 rounded-xl border border-wordle-border mb-6">
+        <label className="block mb-2 font-bold text-gray-300">Your Name</label>
+        <input 
+          type="text" 
+          placeholder="e.g. Player 2" 
+          value={name}
+          onChange={e => setName(e.target.value)}
+          disabled={roomInfo !== null}
+          className="w-full p-3 bg-black border-2 border-wordle-border rounded text-center text-xl focus:border-wordle-highlight outline-none disabled:opacity-50 mb-6"
+        />
+
         <label className="block mb-2 font-bold text-gray-300">Enter Room Code</label>
         <div className="flex gap-2">
           <input 
@@ -56,14 +66,14 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
           {!roomInfo && (
             <button 
               onClick={handleCheckRoom}
-              disabled={loading || !code.trim()}
+              disabled={loading || !code.trim() || !name.trim()}
               className="bg-wordle-green px-4 rounded font-bold text-white disabled:opacity-50 transition"
             >
               Verify
             </button>
           )}
         </div>
-        {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
+        {error && <p className="text-red-500 mt-2 text-sm font-bold">{error}</p>}
       </div>
 
       {roomInfo && (
@@ -75,21 +85,11 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
             <li><strong>Rounds:</strong> {roomInfo.roundCount} Total</li>
           </ul>
 
-          <label className="block mb-2 font-bold text-gray-300">Your Name</label>
-          <input 
-            type="text" 
-            placeholder="Enter your name" 
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full p-3 bg-black border-2 border-wordle-border rounded text-center text-xl mb-4 focus:border-wordle-highlight outline-none"
-          />
-
           <button 
             onClick={handleJoin}
-            disabled={!name.trim()}
-            className="w-full bg-wordle-highlight p-4 rounded text-xl font-bold text-white disabled:opacity-50 hover:opacity-90 transition"
+            className="w-full bg-wordle-highlight p-4 rounded text-xl font-bold text-white hover:opacity-90 transition shadow-lg"
           >
-            Join Room
+            Join Room As {name}
           </button>
         </div>
       )}
