@@ -18,25 +18,41 @@ function MultiplayerJoin({ onJoinRoom, onBack }) {
       socket.connect();
     }
 
-    // Wait a brief moment for connection to establish if it was offline
-    setTimeout(() => {
-      if (!socket.connected) {
-        setLoading(false);
-        setError('Cannot connect to server. Is the backend running?');
-        return;
-      }
+    if (socket.connected) {
+      verifyRoom();
+      return;
+    }
 
-      socket.emit('check_room', code.trim(), (response) => {
+    let attempts = 0;
+    const maxAttempts = 50; // Wait up to 50 seconds for Render to wake up
+    
+    const checkConnection = setInterval(() => {
+      attempts++;
+      
+      if (socket.connected) {
+        clearInterval(checkConnection);
+        verifyRoom();
+      } else if (attempts === 3) {
+        setError('Waking up server... (can take up to 50s)');
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkConnection);
         setLoading(false);
-        if (response.valid) {
-          setRoomInfo(response);
-          setError('');
-        } else {
-          setError(response.error || 'Invalid room code.');
-          setRoomInfo(null);
-        }
-      });
-    }, socket.connected ? 0 : 1000);
+        setError('Server timeout. Please try again.');
+      }
+    }, 1000);
+  };
+
+  const verifyRoom = () => {
+    socket.emit('check_room', code.trim(), (response) => {
+      setLoading(false);
+      if (response.valid) {
+        setRoomInfo(response);
+        setError('');
+      } else {
+        setError(response.error || 'Invalid room code.');
+        setRoomInfo(null);
+      }
+    });
   };
 
   const handleJoin = () => {
