@@ -155,10 +155,16 @@ function App() {
   // Resolve Multiplayer Views
   let activeMpView = view;
   if (mode === 'MULTIPLAYER' && view === 'MP_WAITING' && mpGameState) {
+    // Look up my own player object from the mpGameState using my socket ID, 
+    // or fallback to checking if I was assigned as a setter/guesser by socketId.
+    // Using socket ID directly is best because names could theoretically be similar.
+    const isSetter = (myPlayerId === setter?.socketId);
+    const isGuesser = (myPlayerId === guesser?.socketId);
+
     if (!mpGameState.secretWord) {
-      activeMpView = (myPlayerId === setter?.socketId) ? 'SET_WORD' : 'SPECTATOR_SETTING';
+      activeMpView = isSetter ? 'SET_WORD' : 'SPECTATOR_SETTING';
     } else {
-      activeMpView = (myPlayerId === guesser?.socketId) ? 'GAME' : 'SPECTATOR_GUESSING';
+      activeMpView = isGuesser ? 'GAME' : 'SPECTATOR_GUESSING';
     }
   }
 
