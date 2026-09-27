@@ -86,6 +86,12 @@ function initSocket(server) {
       gameState.currentTurnIdx = 0;
       gameState.gameId = gameId;
       
+      // CRITICAL FIX: Reset secretWord and board state when starting a NEW game!
+      gameState.secretWord = null;
+      gameState.boardState = [];
+      gameState.turnResult = null;
+      gameState.turnId = null;
+      
       updateTurnPointers();
       
       io.to(ROOM_CODE).emit('game_started', gameState);
